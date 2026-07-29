@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas y Kardex
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas y contratos
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <section class="encabezado-pagina">
+
+            <div>
+                <p class="etiqueta-seccion">
+                    RESUMEN GENERAL
+                </p>
+
+                <h1>Dashboard</h1>
+
+                <p class="descripcion-pagina">
+                    Resumen del inventario, ventas a crédito,
+                    cobranzas y saldos pendientes.
+                </p>
+            </div>
+
+            <div class="acciones-encabezado">
+
+                <span id="fechaDashboard">
+                    Cargando fecha...
+                </span>
+
+                <button type="button" id="btnActualizarDashboard" class="boton-principal">
+                    Actualizar
+                </button>
+
+            </div>
+
+        </section>
+
+        <div id="mensajeDashboard" class="mensaje-sistema oculto"></div>
+
+        <section class="tarjetas-dashboard">
+
+            <article class="tarjeta-dashboard">
+
+                <span>Productos activos</span>
+
+                <strong id="dashboardTotalProductos">
+                    0
+                </strong>
+
+                <small>
+                    Productos disponibles para vender
+                </small>
+
+            </article>
+
+            <article class="tarjeta-dashboard">
+
+                <span>Stock en almacén</span>
+
+                <strong id="dashboardStockAlmacen">
+                    0
+                </strong>
+
+                <small>
+                    Unidades guardadas en almacén
+                </small>
+
+            </article>
+
+            <article class="tarjeta-dashboard">
+
+                <span>Salidas abiertas</span>
+
+                <strong id="dashboardSalidasAbiertas">
+                    0
+                </strong>
+
+                <small>
+                    Mercadería que continúa en ruta
+                </small>
+
+            </article>
+
+            <article class="tarjeta-dashboard">
+
+                <span>Contratos activos</span>
+
+                <strong id="dashboardVentasActivas">
+                    0
+                </strong>
+
+                <small>
+                    Ventas que todavía tienen saldo
+                </small>
+
+            </article>
+
+            <article class="tarjeta-dashboard tarjeta-alerta">
+
+                <span>Deuda pendiente</span>
+
+                <strong id="dashboardDeudaPendiente">
+                    S/ 0.00
+                </strong>
+
+                <small>
+                    Dinero pendiente de cobranza
+                </small>
+
+            </article>
+
+            <article class="tarjeta-dashboard tarjeta-exito">
+
+                <span>Cobrado hoy</span>
+
+                <strong id="dashboardCobradoHoy">
+                    S/ 0.00
+                </strong>
+
+                <small>
+                    Pagos registrados en la fecha actual
+                </small>
+
+            </article>
+
+        </section>
+
+        <section class="dashboard-dos-columnas">
+
+            <article class="panel">
+
+                <div class="panel-encabezado">
+
+                    <div>
+                        <h2>Productos con stock bajo</h2>
+
+                        <p>
+                            Productos que necesitan reposición.
+                        </p>
+                    </div>
+
+                    <a href="productos.html" class="boton-secundario">
+                        Ver productos
+                    </a>
+
+                </div>
+
+                <div class="tabla-contenedor">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Producto</th>
+                                <th>Stock</th>
+                                <th>Mínimo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaStockBajoDashboard">
+
+                            <tr>
+                                <td colspan="4" class="tabla-vacia">
+                                    Cargando productos...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </article>
+
+            <article class="panel">
+
+                <div class="panel-encabezado">
+
+                    <div>
+                        <h2>Cuotas vencidas</h2>
+
+                        <p>
+                            Clientes con pagos atrasados.
+                        </p>
+                    </div>
+
+                    <a href="cobranzas.html" class="boton-secundario">
+                        Ir a cobranzas
+                    </a>
+
+                </div>
+
+                <div class="tabla-contenedor">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Contrato</th>
+                                <th>Cliente</th>
+                                <th>Vencimiento</th>
+                                <th>Saldo</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="tablaCuotasVencidasDashboard">
+
+                            <tr>
+                                <td colspan="5" class="tabla-vacia">
+                                    Cargando cuotas vencidas...
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </article>
+
+        </section>
+
+    </main>
+
+    <script src="js/dashboard.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Salidas y Kardex | ControlVentas</title>
+
+    <link
+        rel="stylesheet"
+        href="css/estilos.css"
+    >
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas y Kardex
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas y contratos
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <header class="encabezado">
+
+            <div>
+                <p class="texto-superior">
+                    Inventario móvil
+                </p>
+
+                <h2>Salidas y Kardex</h2>
+
+                <p class="fecha-consulta">
+                    Controla la mercadería cargada en el carro
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="btnNuevaSalida"
+                class="boton-actualizar"
+            >
+                Nueva salida
+            </button>
+
+        </header>
+
+        <div
+            id="mensajeSalida"
+            class="mensaje-sistema oculto"
+        ></div>
+
+        <section
+            id="panelNuevaSalida"
+            class="panel-formulario"
+        >
+
+            <div class="titulo-seccion">
+                <div>
+                    <h3>Registrar salida</h3>
+
+                    <p>
+                        Indica la ruta y los productos que llevará
+                    </p>
+                </div>
+            </div>
+
+            <form id="formSalida">
+
+                <div class="formulario-grid">
+
+                    <div class="campo">
+                        <label for="fechaSalida">
+                            Fecha de salida *
+                        </label>
+
+                        <input
+                            type="date"
+                            id="fechaSalida"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="vendedor">
+                            Vendedor *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="vendedor"
+                            maxlength="150"
+                            placeholder="Nombre del vendedor"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="destino">
+                            Ruta o destino *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="destino"
+                            maxlength="200"
+                            placeholder="Tablada - VMT - Pamplona"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo campo-doble">
+                        <label for="observacionesSalida">
+                            Observaciones
+                        </label>
+
+                        <input
+                            type="text"
+                            id="observacionesSalida"
+                            maxlength="300"
+                            placeholder="Salida de mercadería del sábado"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="selector-carga">
+
+                    <div class="titulo-seccion">
+                        <div>
+                            <h3>Agregar mercadería</h3>
+
+                            <p>
+                                Selecciona un producto y su cantidad
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="fila-agregar-producto">
+
+                        <div class="campo campo-producto-salida">
+
+                            <label for="productoSalida">
+                                Producto
+                            </label>
+
+                            <select id="productoSalida">
+                                <option value="">
+                                    Cargando productos...
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div class="campo campo-cantidad-salida">
+
+                            <label for="cantidadSalida">
+                                Cantidad
+                            </label>
+
+                            <input
+                                type="number"
+                                id="cantidadSalida"
+                                min="1"
+                                step="1"
+                                value="1"
+                            >
+
+                        </div>
+
+                        <button
+                            type="button"
+                            id="btnAgregarProductoSalida"
+                            class="boton-primario boton-agregar-carga"
+                        >
+                            Agregar
+                        </button>
+
+                    </div>
+
+                    <div class="tabla-responsive">
+
+                        <table class="tabla-datos">
+
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Producto</th>
+                                    <th>Stock disponible</th>
+                                    <th>Cantidad a cargar</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tablaCarga">
+
+                                <tr>
+                                    <td
+                                        colspan="5"
+                                        class="tabla-vacia"
+                                    >
+                                        Agrega productos a la salida.
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="resumen-carga">
+
+                        <span>Total de unidades</span>
+
+                        <strong id="totalUnidadesCarga">
+                            0
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button
+                        type="button"
+                        id="btnLimpiarSalida"
+                        class="boton-secundario"
+                    >
+                        Limpiar
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="btnGuardarSalida"
+                        class="boton-primario"
+                    >
+                        Confirmar salida
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="panel-tabla">
+
+            <div class="cabecera-tabla">
+
+                <div>
+                    <h3>Salidas registradas</h3>
+
+                    <p>
+                        <span id="contadorSalidas">0</span>
+                        salidas encontradas
+                    </p>
+                </div>
+
+                <div class="filtros-productos">
+
+                    <input
+                        type="search"
+                        id="buscadorSalidas"
+                        placeholder="Buscar destino o vendedor"
+                    >
+
+                    <select id="filtroEstadoSalida">
+
+                        <option value="TODAS">
+                            Todas
+                        </option>
+
+                        <option value="ABIERTA">
+                            Abiertas
+                        </option>
+
+                        <option value="CERRADA">
+                            Cerradas
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Fecha</th>
+                            <th>Destino</th>
+                            <th>Vendedor</th>
+                            <th>Unidades</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaSalidas">
+
+                        <tr>
+                            <td
+                                colspan="7"
+                                class="tabla-vacia"
+                            >
+                                Cargando salidas...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <section
+            id="panelKardex"
+            class="panel-tabla oculto"
+        >
+
+            <div class="cabecera-kardex">
+
+                <div>
+                    <p class="texto-superior">
+                        Detalle de salida
+                    </p>
+
+                    <h3 id="tituloKardex">
+                        Kardex
+                    </h3>
+
+                    <p id="informacionKardex">
+                        Información de la salida
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    id="btnCerrarPanelKardex"
+                    class="boton-secundario"
+                >
+                    Ocultar
+                </button>
+
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cargado</th>
+                            <th>Vendido</th>
+                            <th>Stock esperado</th>
+                            <th>Conteo físico</th>
+                            <th>Diferencia</th>
+                            <th>Observación</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaKardex"></tbody>
+
+                </table>
+
+            </div>
+
+            <div
+                id="accionesCierreSalida"
+                class="acciones-formulario"
+            >
+
+                <button
+                    type="button"
+                    id="btnCerrarSalida"
+                    class="boton-primario"
+                >
+                    Cerrar salida y devolver al almacén
+                </button>
+
+            </div>
+
+        </section>
+
+        <footer class="pie-pagina">
+            Sistema de inventario, ventas al crédito
+            y cobranzas
+        </footer>
+
+    </main>
+
+    <script src="js/salidas.js"></script>
+
+</body>
+</html>

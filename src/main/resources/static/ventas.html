@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ventas y contratos | ControlVentas</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas y Kardex
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas y contratos
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <header class="encabezado">
+
+            <div>
+                <p class="texto-superior">
+                    Créditos
+                </p>
+
+                <h2>Ventas y contratos</h2>
+
+                <p class="fecha-consulta">
+                    Registra productos vendidos al crédito
+                </p>
+            </div>
+
+            <button type="button" id="btnNuevaVenta" class="boton-actualizar">
+                Nueva venta
+            </button>
+
+        </header>
+
+        <div id="mensajeVenta" class="mensaje-sistema oculto"></div>
+
+        <section id="panelNuevaVenta" class="panel-formulario">
+
+            <div class="titulo-seccion">
+                <div>
+                    <h3>Registrar venta al crédito</h3>
+
+                    <p>
+                        Selecciona al cliente y la salida
+                    </p>
+                </div>
+            </div>
+
+            <form id="formVenta">
+
+                <div class="formulario-grid">
+
+                    <div class="campo">
+                        <label for="clienteVenta">
+                            Cliente *
+                        </label>
+
+                        <select id="clienteVenta" required>
+                            <option value="">
+                                Cargando clientes...
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="salidaVenta">
+                            Salida abierta *
+                        </label>
+
+                        <select id="salidaVenta" required>
+                            <option value="">
+                                Cargando salidas...
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="campo">
+                        <label for="fechaVenta">
+                            Fecha de venta *
+                        </label>
+
+                        <input type="date" id="fechaVenta" required>
+                    </div>
+
+                    <div class="campo">
+                        <label for="cobradorVenta">
+                            Cobrador
+                        </label>
+
+                        <select id="cobradorVenta">
+                            <option value="">
+                                Sin asignar
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="selector-carga">
+
+                    <div class="titulo-seccion">
+                        <div>
+                            <h3>Productos vendidos</h3>
+
+                            <p>
+                                Solo aparecen productos del carro
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="fila-producto-venta">
+
+                        <div class="campo campo-producto-venta">
+
+                            <label for="productoVenta">
+                                Producto
+                            </label>
+
+                            <select id="productoVenta">
+                                <option value="">
+                                    Primero selecciona una salida
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="cantidadVenta">
+                                Cantidad
+                            </label>
+
+                            <input type="number" id="cantidadVenta" min="1" step="1" value="1">
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="precioVentaCredito">
+                                Precio unitario
+                            </label>
+
+                            <input type="number" id="precioVentaCredito" min="0.01" step="0.01" placeholder="0.00">
+
+                        </div>
+
+                        <button type="button" id="btnAgregarProductoVenta" class="boton-primario">
+                            Agregar
+                        </button>
+
+                    </div>
+
+                    <div class="tabla-responsive">
+
+                        <table class="tabla-datos">
+
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Disponible</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio</th>
+                                    <th>Subtotal</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tablaProductosVenta">
+
+                                <tr>
+                                    <td colspan="6" class="tabla-vacia">
+                                        Agrega productos a la venta.
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="resumen-venta">
+
+                        <span>Total de la venta</span>
+
+                        <strong id="totalVentaVisual">
+                            S/0.00
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="selector-carga">
+
+                    <div class="titulo-seccion">
+                        <div>
+                            <h3>Condiciones del crédito</h3>
+
+                            <p>
+                                Cuota inicial y modalidad de pago
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="formulario-grid">
+
+                        <div class="campo">
+
+                            <label for="cuotaInicial">
+                                Cuota inicial *
+                            </label>
+
+                            <input type="number" id="cuotaInicial" min="0" step="0.01" value="0" required>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="modalidadPago">
+                                Modalidad *
+                            </label>
+
+                            <select id="modalidadPago" required>
+                                <option value="">
+                                    Selecciona
+                                </option>
+
+                                <option value="DIARIO">
+                                    Diario
+                                </option>
+
+                                <option value="SEMANAL">
+                                    Semanal
+                                </option>
+
+                                <option value="QUINCENAL">
+                                    Quincenal
+                                </option>
+
+                                <option value="MENSUAL">
+                                    Mensual
+                                </option>
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="montoCuota">
+                                Monto de cada cuota *
+                            </label>
+
+                            <input type="number" id="montoCuota" min="0.01" step="0.01" placeholder="14.00" required>
+
+                        </div>
+
+                        <div id="campoDiaPago" class="campo">
+
+                            <label for="diaPago">
+                                Día de pago semanal
+                            </label>
+
+                            <select id="diaPago">
+                                <option value="">
+                                    Selecciona
+                                </option>
+                                <option value="LUNES">Lunes</option>
+                                <option value="MARTES">Martes</option>
+                                <option value="MIERCOLES">Miércoles</option>
+                                <option value="JUEVES">Jueves</option>
+                                <option value="VIERNES">Viernes</option>
+                                <option value="SABADO">Sábado</option>
+                                <option value="DOMINGO">Domingo</option>
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label for="fechaPrimerPago">
+                                Fecha del primer pago *
+                            </label>
+
+                            <input type="date" id="fechaPrimerPago" required>
+
+                        </div>
+
+                        <div class="campo campo-doble">
+
+                            <label for="observacionesVenta">
+                                Observaciones
+                            </label>
+
+                            <input type="text" id="observacionesVenta" maxlength="300" placeholder="Venta a crédito">
+
+                        </div>
+
+                    </div>
+
+                    <div class="resumen-credito">
+
+                        <div>
+                            <span>Total</span>
+                            <strong id="resumenTotal">
+                                S/0.00
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Cuota inicial</span>
+                            <strong id="resumenInicial">
+                                S/0.00
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Saldo pendiente</span>
+                            <strong id="resumenSaldo">
+                                S/0.00
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button type="button" id="btnLimpiarVenta" class="boton-secundario">
+                        Limpiar
+                    </button>
+
+                    <button type="submit" id="btnGuardarVenta" class="boton-primario">
+                        Generar contrato
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="panel-tabla">
+
+            <div class="cabecera-tabla">
+
+                <div>
+                    <h3>Contratos registrados</h3>
+
+                    <p>
+                        <span id="contadorVentas">0</span>
+                        contratos encontrados
+                    </p>
+                </div>
+
+                <div class="filtros-productos">
+
+                    <input type="search" id="buscadorVentas" placeholder="Buscar contrato o cliente">
+
+                    <select id="filtroEstadoVenta">
+                        <option value="TODAS">Todas</option>
+                        <option value="ACTIVA">Activas</option>
+                        <option value="PAGADA">Pagadas</option>
+                        <option value="ANULADA">Anuladas</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Contrato</th>
+                            <th>Cliente</th>
+                            <th>Fecha</th>
+                            <th>Total</th>
+                            <th>Saldo</th>
+                            <th>Modalidad</th>
+                            <th>Cobrador</th>
+                            <th>Estado</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaVentas">
+
+                        <tr>
+                            <td colspan="9" class="tabla-vacia">
+                                Cargando contratos...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <section id="panelDetalleVenta" class="panel-tabla oculto">
+
+            <div class="cabecera-kardex">
+
+                <div>
+                    <p class="texto-superior">
+                        Contrato
+                    </p>
+
+                    <h3 id="tituloDetalleVenta">
+                        Detalle del contrato
+                    </h3>
+
+                    <p id="informacionDetalleVenta"></p>
+                </div>
+
+                <button type="button" id="btnOcultarDetalleVenta" class="boton-secundario">
+                    Ocultar
+                </button>
+
+            </div>
+
+            <div id="datosDetalleVenta"></div>
+
+            <div class="titulo-seccion titulo-cuotas">
+                <div>
+                    <h3>Cronograma de cuotas</h3>
+                    <p>Pagos programados del contrato</p>
+                </div>
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Cuota</th>
+                            <th>Vencimiento</th>
+                            <th>Programado</th>
+                            <th>Pagado</th>
+                            <th>Pendiente</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaCuotasVenta"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <footer class="pie-pagina">
+            Sistema de inventario, ventas al crédito
+            y cobranzas
+        </footer>
+
+    </main>
+
+    <script src="js/ventas.js"></script>
+
+</body>
+
+</html>

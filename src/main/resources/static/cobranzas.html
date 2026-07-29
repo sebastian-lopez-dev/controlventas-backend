@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cobranzas | ControlVentas</title>
+
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas y Kardex
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas y contratos
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <section class="encabezado-pagina">
+
+            <div>
+                <p class="etiqueta-seccion">
+                    CONTROL DE PAGOS
+                </p>
+
+                <h1>Hoja de cobranza</h1>
+
+                <p class="descripcion-pagina">
+                    Registra los pagos realizados por los
+                    clientes y actualiza automáticamente
+                    sus saldos pendientes.
+                </p>
+            </div>
+
+        </section>
+
+        <div id="mensajeCobranza" class="mensaje-sistema oculto"></div>
+
+        <section class="panel">
+
+            <div class="panel-encabezado">
+
+                <div>
+                    <h2>Seleccionar cobranza</h2>
+
+                    <p>
+                        Selecciona al cobrador y la fecha
+                        de la hoja de cobranza.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="formulario-grid">
+
+                <div class="campo-formulario">
+
+                    <label for="cobradorHoja">
+                        Cobrador
+                    </label>
+
+                    <select id="cobradorHoja">
+                        <option value="">
+                            Cargando cobradores...
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="campo-formulario">
+
+                    <label for="fechaHojaCobranza">
+                        Fecha
+                    </label>
+
+                    <input type="date" id="fechaHojaCobranza">
+
+                </div>
+
+                <div class="campo-formulario campo-acciones">
+
+                    <button type="button" id="btnCargarHoja" class="boton-principal">
+                        Cargar hoja
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="tarjetas-resumen">
+
+            <article class="tarjeta-resumen">
+
+                <span>Contratos asignados</span>
+
+                <strong id="totalContratosCobranza">
+                    0
+                </strong>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <span>Saldo pendiente</span>
+
+                <strong id="totalPendienteCobranza">
+                    S/ 0.00
+                </strong>
+
+            </article>
+
+            <article class="tarjeta-resumen">
+
+                <span>Cobrado hoy</span>
+
+                <strong id="totalCobradoCobranza">
+                    S/ 0.00
+                </strong>
+
+            </article>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="panel-encabezado">
+
+                <div>
+                    <h2>Contratos por cobrar</h2>
+
+                    <p>
+                        Hoja de cobranza del trabajador
+                        seleccionado.
+                    </p>
+                </div>
+
+                <div class="buscador-tabla">
+
+                    <input type="search" id="buscadorCobranza" placeholder="Buscar cliente o contrato">
+
+                </div>
+
+            </div>
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Contrato</th>
+                            <th>Cliente</th>
+                            <th>Modalidad</th>
+                            <th>Cuota</th>
+                            <th>Saldo</th>
+                            <th>Próximo pago</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaHojaCobranza">
+
+                        <tr>
+                            <td colspan="7" class="tabla-vacia">
+                                Selecciona un cobrador para
+                                cargar su hoja.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <section id="panelRegistrarPago" class="panel oculto">
+
+            <div class="panel-encabezado">
+
+                <div>
+                    <p class="etiqueta-seccion">
+                        NUEVO PAGO
+                    </p>
+
+                    <h2 id="tituloPago">
+                        Registrar pago
+                    </h2>
+
+                    <div id="informacionPago">
+                        Selecciona un contrato.
+                    </div>
+                </div>
+
+                <button type="button" id="btnCerrarPanelPago" class="boton-secundario">
+                    Cerrar
+                </button>
+
+            </div>
+
+            <form id="formPago">
+
+                <input type="hidden" id="idVentaPago">
+
+                <div class="formulario-grid">
+
+                    <div class="campo-formulario">
+
+                        <label for="fechaPago">
+                            Fecha del pago
+                        </label>
+
+                        <input type="date" id="fechaPago" required>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="montoPago">
+                            Monto recibido
+                        </label>
+
+                        <input type="number" id="montoPago" min="0.01" step="0.01" placeholder="0.00" required>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="medioPago">
+                            Medio de pago
+                        </label>
+
+                        <select id="medioPago" required>
+                            <option value="EFECTIVO">
+                                Efectivo
+                            </option>
+
+                            <option value="YAPE">
+                                Yape
+                            </option>
+
+                            <option value="PLIN">
+                                Plin
+                            </option>
+
+                            <option value="TRANSFERENCIA">
+                                Transferencia
+                            </option>
+                        </select>
+
+                    </div>
+
+                    <div class="campo-formulario">
+
+                        <label for="numeroOperacionPago">
+                            Número de operación
+                        </label>
+
+                        <input type="text" id="numeroOperacionPago" maxlength="100" placeholder="Opcional">
+
+                    </div>
+
+                    <div class="campo-formulario campo-completo">
+
+                        <label for="observacionesPago">
+                            Observaciones
+                        </label>
+
+                        <textarea id="observacionesPago" rows="3" maxlength="300"
+                            placeholder="Observaciones del pago"></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button type="button" id="btnCancelarPago" class="boton-secundario">
+                        Cancelar
+                    </button>
+
+                    <button type="submit" id="btnGuardarPago" class="boton-principal">
+                        Registrar pago
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="panel-encabezado">
+
+                <div>
+                    <h2>Pagos registrados</h2>
+
+                    <p>
+                        Últimos pagos recibidos de los clientes.
+                    </p>
+                </div>
+
+                <strong id="contadorPagos">
+                    0 pagos
+                </strong>
+
+            </div>
+
+            <div class="tabla-contenedor">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Recibo</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Contrato</th>
+                            <th>Monto</th>
+                            <th>Cobrador</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaPagosRecientes">
+
+                        <tr>
+                            <td colspan="6" class="tabla-vacia">
+                                Todavía no se cargaron los pagos.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="js/cobranzas.js"></script>
+
+</body>
+
+</html>

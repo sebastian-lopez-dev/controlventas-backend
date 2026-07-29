@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Productos | ControlVentas</title>
+
+    <link
+        rel="stylesheet"
+        href="css/estilos.css"
+    >
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <header class="encabezado">
+
+            <div>
+                <p class="texto-superior">
+                    Inventario
+                </p>
+
+                <h2>Gestión de productos</h2>
+
+                <p class="fecha-consulta">
+                    Registra y controla la mercadería
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="btnNuevoProducto"
+                class="boton-actualizar"
+            >
+                Nuevo producto
+            </button>
+
+        </header>
+
+        <div
+            id="mensajeProducto"
+            class="mensaje-sistema oculto"
+        ></div>
+
+        <section class="panel-formulario">
+
+            <div class="titulo-seccion">
+                <div>
+                    <h3 id="tituloFormulario">
+                        Registrar producto
+                    </h3>
+
+                    <p>
+                        Completa los datos de la mercadería
+                    </p>
+                </div>
+            </div>
+
+            <form id="formProducto">
+
+                <input
+                    type="hidden"
+                    id="idProducto"
+                >
+
+                <div class="formulario-grid">
+
+                    <div class="campo">
+                        <label for="codigo">
+                            Código *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="codigo"
+                            maxlength="30"
+                            placeholder="Ejemplo: ZAP-001"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo campo-doble">
+                        <label for="nombre">
+                            Nombre del producto *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombre"
+                            maxlength="150"
+                            placeholder="Zapatilla New Athletic"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="categoria">
+                            Categoría
+                        </label>
+
+                        <input
+                            type="text"
+                            id="categoria"
+                            maxlength="100"
+                            placeholder="Calzado"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="marca">
+                            Marca
+                        </label>
+
+                        <input
+                            type="text"
+                            id="marca"
+                            maxlength="100"
+                            placeholder="New Athletic"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="modelo">
+                            Modelo
+                        </label>
+
+                        <input
+                            type="text"
+                            id="modelo"
+                            maxlength="100"
+                            placeholder="Cápsula"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="color">
+                            Color
+                        </label>
+
+                        <input
+                            type="text"
+                            id="color"
+                            maxlength="50"
+                            placeholder="Negro"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="talla">
+                            Talla
+                        </label>
+
+                        <input
+                            type="text"
+                            id="talla"
+                            maxlength="20"
+                            placeholder="41"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="precioVenta">
+                            Precio de venta *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="precioVenta"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="0.00"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="stockAlmacen">
+                            Stock inicial *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="stockAlmacen"
+                            min="0"
+                            step="1"
+                            value="0"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="stockMinimo">
+                            Stock mínimo *
+                        </label>
+
+                        <input
+                            type="number"
+                            id="stockMinimo"
+                            min="0"
+                            step="1"
+                            value="0"
+                            required
+                        >
+                    </div>
+
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button
+                        type="button"
+                        id="btnCancelar"
+                        class="boton-secundario"
+                    >
+                        Limpiar
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="btnGuardarProducto"
+                        class="boton-primario"
+                    >
+                        Guardar producto
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="panel-tabla">
+
+            <div class="cabecera-tabla">
+
+                <div>
+                    <h3>Productos registrados</h3>
+
+                    <p>
+                        <span id="contadorProductos">0</span>
+                        productos encontrados
+                    </p>
+                </div>
+
+                <div class="filtros-productos">
+
+                    <input
+                        type="search"
+                        id="buscadorProductos"
+                        placeholder="Buscar por código, nombre o marca"
+                    >
+
+                    <select id="filtroEstado">
+
+                        <option value="TODOS">
+                            Todos
+                        </option>
+
+                        <option value="ACTIVOS">
+                            Activos
+                        </option>
+
+                        <option value="INACTIVOS">
+                            Inactivos
+                        </option>
+
+                        <option value="STOCK_BAJO">
+                            Stock bajo
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Producto</th>
+                            <th>Detalles</th>
+                            <th>Precio</th>
+                            <th>Stock</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaProductos">
+
+                        <tr>
+                            <td
+                                colspan="7"
+                                class="tabla-vacia"
+                            >
+                                Cargando productos...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <footer class="pie-pagina">
+            Sistema de inventario, ventas al crédito
+            y cobranzas
+        </footer>
+
+    </main>
+
+    <script src="js/productos.js"></script>
+
+</body>
+</html>

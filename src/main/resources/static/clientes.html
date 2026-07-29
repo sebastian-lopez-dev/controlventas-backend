@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Clientes | ControlVentas</title>
+
+    <link
+        rel="stylesheet"
+        href="css/estilos.css"
+    >
+</head>
+
+<body>
+
+    <aside class="menu-lateral">
+
+        <div class="marca">
+            <div class="marca-icono">CV</div>
+
+            <div>
+                <h1>ControlVentas</h1>
+                <p>Gestión comercial</p>
+            </div>
+        </div>
+
+        <nav class="navegacion">
+
+            <a href="dashboard.html">
+                <span>▦</span>
+                Dashboard
+            </a>
+
+            <a href="productos.html">
+                <span>□</span>
+                Productos
+            </a>
+
+            <a href="clientes.html">
+                <span>♙</span>
+                Clientes
+            </a>
+
+            <a href="salidas.html">
+                <span>▤</span>
+                Salidas y Kardex
+            </a>
+
+            <a href="ventas.html">
+                <span>◇</span>
+                Ventas y contratos
+            </a>
+
+            <a href="cobranzas.html">
+                <span>◎</span>
+                Cobranzas
+            </a>
+
+            <a href="reportes.html">
+                <span>◫</span>
+                Reportes
+            </a>
+
+        </nav>
+
+        <div class="usuario-menu">
+            <div class="usuario-avatar">A</div>
+
+            <div>
+                <strong>Administrador</strong>
+                <small>Control completo</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <main class="contenido-principal">
+
+        <header class="encabezado">
+
+            <div>
+                <p class="texto-superior">
+                    Personas
+                </p>
+
+                <h2>Gestión de clientes</h2>
+
+                <p class="fecha-consulta">
+                    Registra los datos utilizados en los contratos
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="btnNuevoCliente"
+                class="boton-actualizar"
+            >
+                Nuevo cliente
+            </button>
+
+        </header>
+
+        <div
+            id="mensajeCliente"
+            class="mensaje-sistema oculto"
+        ></div>
+
+        <section class="panel-formulario">
+
+            <div class="titulo-seccion">
+                <div>
+                    <h3 id="tituloFormularioCliente">
+                        Registrar cliente
+                    </h3>
+
+                    <p>
+                        Completa los datos del comprador
+                    </p>
+                </div>
+            </div>
+
+            <form id="formCliente">
+
+                <input
+                    type="hidden"
+                    id="idCliente"
+                >
+
+                <div class="formulario-grid">
+
+                    <div class="campo">
+                        <label for="nombres">
+                            Nombres *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nombres"
+                            maxlength="100"
+                            placeholder="Nombres del cliente"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="apellidoPaterno">
+                            Apellido paterno *
+                        </label>
+
+                        <input
+                            type="text"
+                            id="apellidoPaterno"
+                            maxlength="100"
+                            placeholder="Apellido paterno"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="apellidoMaterno">
+                            Apellido materno
+                        </label>
+
+                        <input
+                            type="text"
+                            id="apellidoMaterno"
+                            maxlength="100"
+                            placeholder="Apellido materno"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="dni">
+                            DNI
+                        </label>
+
+                        <input
+                            type="text"
+                            id="dni"
+                            maxlength="8"
+                            inputmode="numeric"
+                            placeholder="8 números"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="celular">
+                            Celular
+                        </label>
+
+                        <input
+                            type="text"
+                            id="celular"
+                            maxlength="9"
+                            inputmode="numeric"
+                            placeholder="9 números"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="zona">
+                            Zona
+                        </label>
+
+                        <input
+                            type="text"
+                            id="zona"
+                            maxlength="100"
+                            placeholder="Tablada, VMT o Pamplona"
+                        >
+                    </div>
+
+                    <div class="campo campo-doble">
+                        <label for="direccion">
+                            Dirección
+                        </label>
+
+                        <input
+                            type="text"
+                            id="direccion"
+                            maxlength="250"
+                            placeholder="Avenida, calle, manzana y lote"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="distrito">
+                            Distrito
+                        </label>
+
+                        <input
+                            type="text"
+                            id="distrito"
+                            maxlength="100"
+                            placeholder="Villa María del Triunfo"
+                        >
+                    </div>
+
+                    <div class="campo campo-doble">
+                        <label for="referencia">
+                            Referencia
+                        </label>
+
+                        <input
+                            type="text"
+                            id="referencia"
+                            maxlength="250"
+                            placeholder="Cerca del mercado o frente al colegio"
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="puestoTrabajo">
+                            Puesto de trabajo
+                        </label>
+
+                        <input
+                            type="text"
+                            id="puestoTrabajo"
+                            maxlength="150"
+                            placeholder="Comerciante"
+                        >
+                    </div>
+
+                </div>
+
+                <div class="acciones-formulario">
+
+                    <button
+                        type="button"
+                        id="btnCancelarCliente"
+                        class="boton-secundario"
+                    >
+                        Limpiar
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="btnGuardarCliente"
+                        class="boton-primario"
+                    >
+                        Guardar cliente
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <section class="panel-tabla">
+
+            <div class="cabecera-tabla">
+
+                <div>
+                    <h3>Clientes registrados</h3>
+
+                    <p>
+                        <span id="contadorClientes">0</span>
+                        clientes encontrados
+                    </p>
+                </div>
+
+                <div class="filtros-productos">
+
+                    <input
+                        type="search"
+                        id="buscadorClientes"
+                        placeholder="Buscar nombre, DNI, código o zona"
+                    >
+
+                    <select id="filtroEstadoCliente">
+
+                        <option value="TODOS">
+                            Todos
+                        </option>
+
+                        <option value="ACTIVOS">
+                            Activos
+                        </option>
+
+                        <option value="INACTIVOS">
+                            Inactivos
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="tabla-responsive">
+
+                <table class="tabla-datos">
+
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Cliente</th>
+                            <th>Contacto</th>
+                            <th>Dirección y zona</th>
+                            <th>Registro</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaClientes">
+
+                        <tr>
+                            <td
+                                colspan="7"
+                                class="tabla-vacia"
+                            >
+                                Cargando clientes...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <footer class="pie-pagina">
+            Sistema de inventario, ventas al crédito
+            y cobranzas
+        </footer>
+
+    </main>
+
+    <script src="js/clientes.js"></script>
+
+</body>
+</html>
