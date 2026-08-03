@@ -7,15 +7,31 @@ import org.springframework.stereotype.Service;
 
 import com.negocio.controlventas.model.Producto;
 import com.negocio.controlventas.repository.ProductoRepository;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.negocio.controlventas.repository.DetalleSalidaRepository;
+import com.negocio.controlventas.repository.DetalleVentaRepository;
 @Service
 public class ProductoService {
 
     private final ProductoRepository productoRepository;
+    private final DetalleSalidaRepository detalleSalidaRepository;
+private final DetalleVentaRepository detalleVentaRepository;
 
-    public ProductoService(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
-    }
+   public ProductoService(
+        ProductoRepository productoRepository,
+        DetalleSalidaRepository detalleSalidaRepository,
+        DetalleVentaRepository detalleVentaRepository) {
+
+    this.productoRepository =
+            productoRepository;
+
+    this.detalleSalidaRepository =
+            detalleSalidaRepository;
+
+    this.detalleVentaRepository =
+            detalleVentaRepository;
+}
 
     public List<Producto> listarProductos() {
         return productoRepository.findAll();
@@ -190,4 +206,31 @@ public class ProductoService {
         return productoRepository
                 .buscarProductosConStockBajo();
     }
+
+    @Transactional
+public void eliminarProductoDefinitivamente(
+        Long idProducto) {
+
+    Producto producto =
+            buscarProductoPorId(idProducto);
+
+    boolean usadoEnSalidas =
+            detalleSalidaRepository
+                    .existsByProducto_IdProducto(
+                            idProducto);
+
+    boolean usadoEnVentas =
+            detalleVentaRepository
+                    .existsByProducto_IdProducto(
+                            idProducto);
+
+    if (usadoEnSalidas || usadoEnVentas) {
+        throw new IllegalArgumentException(
+                "Este producto tiene movimientos "
+                        + "registrados y no puede eliminarse. "
+                        + "Puedes desactivarlo.");
+    }
+
+    productoRepository.delete(producto);
+}
 }

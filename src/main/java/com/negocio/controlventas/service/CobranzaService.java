@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.negocio.controlventas.dto.CobranzaPendienteResponse;
 import com.negocio.controlventas.model.Cliente;
@@ -20,117 +21,125 @@ import com.negocio.controlventas.repository.CuotaRepository;
 @Service
 public class CobranzaService {
 
-        private final CuotaRepository cuotaRepository;
-        private final CobradorRepository cobradorRepository;
+    private final CuotaRepository cuotaRepository;
+    private final CobradorRepository cobradorRepository;
 
-        public CobranzaService(
-                        CuotaRepository cuotaRepository,
-                        CobradorRepository cobradorRepository) {
+    public CobranzaService(
+            CuotaRepository cuotaRepository,
+            CobradorRepository cobradorRepository) {
 
-                this.cuotaRepository = cuotaRepository;
-                this.cobradorRepository = cobradorRepository;
+        this.cuotaRepository = cuotaRepository;
+        this.cobradorRepository = cobradorRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<CobranzaPendienteResponse> listarCobranzas(
+            Long idCobrador,
+            LocalDate fechaConsulta) {
+
+        if (idCobrador == null) {
+            throw new IllegalArgumentException(
+                    "El cobrador es obligatorio");
         }
 
-        public List<CobranzaPendienteResponse> listarCobranzas(
-                        Long idCobrador,
-                        LocalDate fechaConsulta) {
-
-                if (fechaConsulta == null) {
-                        throw new IllegalArgumentException(
-                                        "La fecha es obligatoria");
-                }
-
-                Cobrador cobrador = cobradorRepository
-                                .findById(idCobrador)
-                                .orElseThrow(() -> new IllegalArgumentException(
-                                                "No existe el cobrador con el ID "
-                                                                + idCobrador));
-
-                if (!Boolean.TRUE.equals(
-                                cobrador.getActivo())) {
-
-                        throw new IllegalArgumentException(
-                                        "El cobrador está desactivado");
-                }
-
-                List<Cuota> cuotas = cuotaRepository.buscarCobrosHastaFecha(
-                                idCobrador,
-                                fechaConsulta,
-                                EstadoVenta.ACTIVA);
-
-                List<CobranzaPendienteResponse> respuesta = new ArrayList<>();
-
-                for (Cuota cuota : cuotas) {
-
-                        respuesta.add(
-                                        convertirRespuesta(
-                                                        cuota,
-                                                        fechaConsulta));
-                }
-
-                return respuesta;
+        if (fechaConsulta == null) {
+            throw new IllegalArgumentException(
+                    "La fecha es obligatoria");
         }
 
-        private CobranzaPendienteResponse convertirRespuesta(
-                        Cuota cuota,
-                        LocalDate fechaConsulta) {
+        Cobrador cobrador = cobradorRepository
+                .findById(idCobrador)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "No existe el cobrador con el ID "
+                                        + idCobrador));
 
-                VentaCredito venta = cuota.getVenta();
-
-                Cliente cliente = venta.getCliente();
-
-                long diasAtraso = 0;
-
-                EstadoCuota estadoMostrado;
-
-                if (cuota.getFechaVencimiento()
-                                .isBefore(fechaConsulta)) {
-
-                        diasAtraso = ChronoUnit.DAYS.between(
-                                        cuota.getFechaVencimiento(),
-                                        fechaConsulta);
-
-                        estadoMostrado = EstadoCuota.VENCIDA;
-
-                } else if (cuota.getMontoPagado()
-                                .signum() > 0) {
-
-                        estadoMostrado = EstadoCuota.PARCIAL;
-
-                } else {
-
-                        estadoMostrado = EstadoCuota.PENDIENTE;
-                }
-
-                String nombreCompleto = cliente.getNombres()
-                                + " "
-                                + cliente.getApellidoPaterno();
-
-                if (cliente.getApellidoMaterno() != null
-                                && !cliente.getApellidoMaterno()
-                                                .isBlank()) {
-
-                        nombreCompleto += " " + cliente.getApellidoMaterno();
-                }
-
-                return new CobranzaPendienteResponse(
-                                cuota.getIdCuota(),
-                                cuota.getNumeroCuota(),
-                                cuota.getFechaVencimiento(),
-                                cuota.getSaldoCuota(),
-                                estadoMostrado,
-
-                                venta.getIdVenta(),
-                                venta.getNumeroContrato(),
-                                venta.getSaldoPendiente(),
-
-                                cliente.getIdCliente(),
-                                cliente.getCodigoCliente(),
-                                nombreCompleto,
-                                cliente.getCelular(),
-                                cliente.getDireccion(),
-                                cliente.getZona(),
-
-                                diasAtraso);
+        if (!Boolean.TRUE.equals(cobrador.getActivo())) {
+            throw new IllegalArgumentException(
+                    "El cobrador está desactivado");
         }
+
+        List<Cuota> cuotas =
+                cuotaRepository.buscarCobrosHastaFecha(
+                        idCobrador,
+                        fechaConsulta,
+                        EstadoVenta.ACTIVA);
+
+        List<CobranzaPendienteResponse> respuesta =
+                new ArrayList<>();
+
+        for (Cuota cuota : cuotas) {
+            respuesta.add(
+                    convertirRespuesta(
+                            cuota,
+                            fechaConsulta));
+        }
+
+        return respuesta;
+    }
+
+    private CobranzaPendienteResponse convertirRespuesta(
+            Cuota cuota,
+            LocalDate fechaConsulta) {
+
+        VentaCredito venta = cuota.getVenta();
+        Cliente cliente = venta.getCliente();
+
+        long diasAtraso = 0;
+        EstadoCuota estadoMostrado;
+
+        if (cuota.getFechaVencimiento()
+                .isBefore(fechaConsulta)) {
+
+            diasAtraso = ChronoUnit.DAYS.between(
+                    cuota.getFechaVencimiento(),
+                    fechaConsulta);
+
+            estadoMostrado = EstadoCuota.VENCIDA;
+
+        } else if (cuota.getMontoPagado().signum() > 0) {
+            estadoMostrado = EstadoCuota.PARCIAL;
+
+        } else {
+            estadoMostrado = EstadoCuota.PENDIENTE;
+        }
+
+        String nombreCompleto = construirNombre(cliente);
+
+        return new CobranzaPendienteResponse(
+                cuota.getIdCuota(),
+                cuota.getNumeroCuota(),
+                cuota.getFechaVencimiento(),
+                cuota.getSaldoCuota(),
+                estadoMostrado,
+
+                venta.getIdVenta(),
+                venta.getNumeroContrato(),
+                venta.getSaldoPendiente(),
+
+                cliente.getIdCliente(),
+                cliente.getCodigoCliente(),
+                nombreCompleto,
+                cliente.getCelular(),
+                cliente.getDireccion(),
+                cliente.getZona(),
+
+                diasAtraso);
+    }
+
+    private String construirNombre(Cliente cliente) {
+        String nombreCompleto =
+                cliente.getNombres()
+                        + " "
+                        + cliente.getApellidoPaterno();
+
+        if (cliente.getApellidoMaterno() != null
+                && !cliente.getApellidoMaterno().isBlank()) {
+
+            nombreCompleto +=
+                    " " + cliente.getApellidoMaterno();
+        }
+
+        return nombreCompleto.trim();
+    }
 }

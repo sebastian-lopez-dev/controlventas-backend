@@ -46,4 +46,6 @@ BigDecimal sumarSaldoPorEstado(
 BigDecimal sumarTotalVendido(
         @Param("estadoAnulado")
         EstadoVenta estadoAnulado);
+
+        boolean existsByCliente_IdCliente(Long idCliente);
 }

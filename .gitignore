@@ -70,3 +70,9 @@ Desktop.ini
 
 # Conservar el Maven Wrapper
 !.mvn/wrapper/maven-wrapper.jar
+
+# Configuración privada de la computadora
+src/main/resources/application-local.properties
+
+# Archivos compilados
+target/

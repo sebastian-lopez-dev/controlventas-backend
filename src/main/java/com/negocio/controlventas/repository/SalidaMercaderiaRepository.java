@@ -14,4 +14,6 @@ public interface SalidaMercaderiaRepository
             EstadoSalida estado);
 
     long countByEstado(EstadoSalida estado);
+
+    boolean existsByEstado(EstadoSalida estado);
 }

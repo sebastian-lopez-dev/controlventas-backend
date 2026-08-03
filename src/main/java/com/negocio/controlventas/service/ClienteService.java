@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.dao.DataIntegrityViolationException;
 
+import com.negocio.controlventas.repository.VentaCreditoRepository;
 import com.negocio.controlventas.model.Cliente;
 import com.negocio.controlventas.repository.ClienteRepository;
 
@@ -12,12 +14,15 @@ import com.negocio.controlventas.repository.ClienteRepository;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+private final VentaCreditoRepository ventaCreditoRepository;
 
-    public ClienteService(
-            ClienteRepository clienteRepository) {
+public ClienteService(
+        ClienteRepository clienteRepository,
+        VentaCreditoRepository ventaCreditoRepository) {
 
-        this.clienteRepository = clienteRepository;
-    }
+    this.clienteRepository = clienteRepository;
+    this.ventaCreditoRepository = ventaCreditoRepository;
+}
 
     public List<Cliente> listarClientes() {
         return clienteRepository.findAll();
@@ -267,4 +272,33 @@ public class ClienteService {
 
         return clienteRepository.save(cliente);
     }
+
+    @Transactional
+public void eliminarClienteDefinitivamente(
+        Long idCliente) {
+
+    Cliente cliente = buscarClientePorId(idCliente);
+
+    boolean tieneContratos =
+            ventaCreditoRepository
+                    .existsByCliente_IdCliente(idCliente);
+
+    if (tieneContratos) {
+        throw new IllegalArgumentException(
+                "Este cliente tiene contratos registrados "
+                + "y no puede eliminarse porque se perdería "
+                + "su historial.");
+    }
+
+    try {
+        clienteRepository.delete(cliente);
+        clienteRepository.flush();
+
+    } catch (DataIntegrityViolationException error) {
+
+        throw new IllegalArgumentException(
+                "Este cliente tiene información relacionada "
+                + "y no puede eliminarse.");
+    }
+}
 }

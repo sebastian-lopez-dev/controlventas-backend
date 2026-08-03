@@ -13,7 +13,9 @@ import com.negocio.controlventas.model.EstadoCuota;
 import com.negocio.controlventas.repository.CuotaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.dao.DataIntegrityViolationException;
+import com.negocio.controlventas.model.Pago;
+import com.negocio.controlventas.repository.PagoRepository;
 import com.negocio.controlventas.dto.DetalleVentaRequest;
 import com.negocio.controlventas.dto.VentaCreditoRequest;
 import com.negocio.controlventas.model.Cliente;
@@ -39,6 +41,7 @@ public class VentaCreditoService {
         private final DetalleSalidaRepository detalleSalidaRepository;
         private final CuotaRepository cuotaRepository;
         private final CobradorRepository cobradorRepository;
+        private final PagoRepository pagoRepository;
 
         public VentaCreditoService(
                         VentaCreditoRepository ventaRepository,
@@ -46,7 +49,8 @@ public class VentaCreditoService {
                         SalidaMercaderiaRepository salidaRepository,
                         DetalleSalidaRepository detalleSalidaRepository,
                         CuotaRepository cuotaRepository,
-                        CobradorRepository cobradorRepository) {
+                        CobradorRepository cobradorRepository,
+                        PagoRepository pagoRepository) {
 
                 this.ventaRepository = ventaRepository;
                 this.clienteRepository = clienteRepository;
@@ -54,6 +58,7 @@ public class VentaCreditoService {
                 this.detalleSalidaRepository = detalleSalidaRepository;
                 this.cuotaRepository = cuotaRepository;
                 this.cobradorRepository = cobradorRepository;
+                this.pagoRepository = pagoRepository;
         }
 
         public List<VentaCredito> listarVentas() {
@@ -126,8 +131,6 @@ public class VentaCreditoService {
                                 solicitud.getFechaPrimerPago());
                 venta.setObservaciones(
                                 solicitud.getObservaciones());
-                venta.setFirmaCliente(
-                                solicitud.getFirmaCliente());
                 venta.setEstado(EstadoVenta.ACTIVA);
 
                 if (solicitud.getDiaPago() != null) {
@@ -338,26 +341,6 @@ public class VentaCreditoService {
                                         "Debe indicar el día de pago semanal");
                 }
 
-                if (solicitud.getFirmaCliente() == null
-                                || solicitud.getFirmaCliente().isBlank()) {
-
-                        throw new IllegalArgumentException(
-                                        "La firma del cliente es obligatoria");
-                }
-
-                if (!solicitud.getFirmaCliente()
-                                .startsWith("data:image/png;base64,")) {
-
-                        throw new IllegalArgumentException(
-                                        "El formato de la firma no es válido");
-                }
-
-                if (solicitud.getFirmaCliente().length() > 1_500_000) {
-
-                        throw new IllegalArgumentException(
-                                        "La firma es demasiado grande");
-                }
-
                 if (solicitud.getDetalles() == null
                                 || solicitud.getDetalles().isEmpty()) {
 
@@ -523,4 +506,96 @@ public class VentaCreditoService {
                                                 idCobrador,
                                                 EstadoVenta.ACTIVA);
         }
+
+   @Transactional
+public void eliminarVenta(Long idVenta) {
+
+    VentaCredito venta =
+            buscarVentaPorId(idVenta);
+    
+    Long idSalida =
+            venta.getSalida().getIdSalida();
+
+    for (DetalleVenta detalleVenta
+            : venta.getDetalles()) {
+
+        Long idProducto =
+                detalleVenta
+                        .getProducto()
+                        .getIdProducto();
+
+        DetalleSalida detalleSalida =
+                detalleSalidaRepository
+                        .findBySalida_IdSalidaAndProducto_IdProducto(
+                                idSalida,
+                                idProducto)
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "No se encontró el producto "
+                                        + "en la salida"));
+
+        int cantidadVendidaActual =
+                detalleSalida
+                        .getCantidadVendida();
+
+        int cantidadDevuelta =
+                detalleVenta.getCantidad();
+
+        int nuevaCantidadVendida =
+                cantidadVendidaActual
+                - cantidadDevuelta;
+
+        if (nuevaCantidadVendida < 0) {
+            throw new IllegalArgumentException(
+                    "No se pudo corregir el stock "
+                    + "del carro");
+        }
+
+        detalleSalida.setCantidadVendida(
+                nuevaCantidadVendida);
+
+        detalleSalidaRepository.save(
+                detalleSalida);
+    }
+
+    /*
+     * Eliminar pagos.
+     * AplicacionPago se elimina automáticamente
+     * porque Pago tiene CascadeType.ALL.
+     */
+    List<Pago> pagos =
+            pagoRepository
+                    .findByVenta_IdVenta(
+                            idVenta);
+
+    pagoRepository.deleteAll(pagos);
+    pagoRepository.flush();
+
+    /*
+     * Eliminar las cuotas del contrato.
+     */
+    List<Cuota> cuotas =
+            cuotaRepository
+                    .findByVenta_IdVentaOrderByNumeroCuotaAsc(
+                            idVenta);
+
+    cuotaRepository.deleteAll(cuotas);
+    cuotaRepository.flush();
+
+    try {
+        /*
+         * Los detalles de venta se eliminan
+         * automáticamente por CascadeType.ALL.
+         */
+        ventaRepository.delete(venta);
+        ventaRepository.flush();
+
+    } catch (DataIntegrityViolationException error) {
+
+        throw new IllegalArgumentException(
+                "El contrato tiene visitas u otra "
+                + "información relacionada que todavía "
+                + "debe eliminarse");
+    }
+}
 }

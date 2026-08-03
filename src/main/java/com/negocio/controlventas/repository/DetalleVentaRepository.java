@@ -11,4 +11,7 @@ public interface DetalleVentaRepository
 
     List<DetalleVenta>
             findByVenta_IdVenta(Long idVenta);
+
+            boolean existsByProducto_IdProducto(
+        Long idProducto);
 }

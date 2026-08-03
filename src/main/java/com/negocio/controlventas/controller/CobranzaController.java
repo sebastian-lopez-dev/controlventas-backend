@@ -1,6 +1,7 @@
 package com.negocio.controlventas.controller;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,80 +21,83 @@ import com.negocio.controlventas.service.ResumenCobranzaService;
 @CrossOrigin(origins = "*")
 public class CobranzaController {
 
-        private final CobranzaService cobranzaService;
-        private final ResumenCobranzaService resumenService;
+    private static final ZoneId ZONA_PERU =
+            ZoneId.of("America/Lima");
 
-        public CobranzaController(
-                        CobranzaService cobranzaService,
-                        ResumenCobranzaService resumenService) {
+    private final CobranzaService cobranzaService;
+    private final ResumenCobranzaService resumenService;
 
-                this.cobranzaService = cobranzaService;
-                this.resumenService = resumenService;
+    public CobranzaController(
+            CobranzaService cobranzaService,
+            ResumenCobranzaService resumenService) {
+
+        this.cobranzaService = cobranzaService;
+        this.resumenService = resumenService;
+    }
+
+    @GetMapping("/cobrador/{idCobrador}/fecha/{fecha}")
+    public ResponseEntity<?> listarPorFecha(
+            @PathVariable Long idCobrador,
+            @PathVariable
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fecha) {
+
+        try {
+            return ResponseEntity.ok(
+                    cobranzaService.listarCobranzas(
+                            idCobrador,
+                            fecha));
+
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "mensaje",
+                            error.getMessage()));
         }
+    }
 
-        @GetMapping("/cobrador/{idCobrador}/fecha/{fecha}")
-        public ResponseEntity<?> listarPorFecha(
-                        @PathVariable Long idCobrador,
+    @GetMapping("/cobrador/{idCobrador}/hoy")
+    public ResponseEntity<?> listarDeHoy(
+            @PathVariable Long idCobrador) {
 
-                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        try {
+            LocalDate fechaPeru =
+                    LocalDate.now(ZONA_PERU);
 
-                try {
-                        return ResponseEntity.ok(
-                                        cobranzaService
-                                                        .listarCobranzas(
-                                                                        idCobrador,
-                                                                        fecha));
+            return ResponseEntity.ok(
+                    cobranzaService.listarCobranzas(
+                            idCobrador,
+                            fechaPeru));
 
-                } catch (IllegalArgumentException error) {
-
-                        return ResponseEntity
-                                        .status(HttpStatus.BAD_REQUEST)
-                                        .body(Map.of(
-                                                        "mensaje",
-                                                        error.getMessage()));
-                }
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "mensaje",
+                            error.getMessage()));
         }
+    }
 
-        @GetMapping("/cobrador/{idCobrador}/hoy")
-        public ResponseEntity<?> listarDeHoy(
-                        @PathVariable Long idCobrador) {
+    @GetMapping("/cobrador/{idCobrador}/resumen/{fecha}")
+    public ResponseEntity<?> obtenerResumen(
+            @PathVariable Long idCobrador,
+            @PathVariable
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fecha) {
 
-                try {
-                        return ResponseEntity.ok(
-                                        cobranzaService
-                                                        .listarCobranzas(
-                                                                        idCobrador,
-                                                                        LocalDate.now()));
+        try {
+            return ResponseEntity.ok(
+                    resumenService.obtenerResumen(
+                            idCobrador,
+                            fecha));
 
-                } catch (IllegalArgumentException error) {
-
-                        return ResponseEntity
-                                        .status(HttpStatus.BAD_REQUEST)
-                                        .body(Map.of(
-                                                        "mensaje",
-                                                        error.getMessage()));
-                }
+        } catch (IllegalArgumentException error) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "mensaje",
+                            error.getMessage()));
         }
-
-        @GetMapping("/cobrador/{idCobrador}/resumen/{fecha}")
-        public ResponseEntity<?> obtenerResumen(
-                        @PathVariable Long idCobrador,
-
-                        @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-
-                try {
-                        return ResponseEntity.ok(
-                                        resumenService.obtenerResumen(
-                                                        idCobrador,
-                                                        fecha));
-
-                } catch (IllegalArgumentException error) {
-
-                        return ResponseEntity
-                                        .badRequest()
-                                        .body(Map.of(
-                                                        "mensaje",
-                                                        error.getMessage()));
-                }
-        }
+    }
 }

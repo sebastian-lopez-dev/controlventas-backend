@@ -1,16 +1,14 @@
 package com.negocio.controlventas.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.negocio.controlventas.model.Cuota;
-import com.negocio.controlventas.model.EstadoCuota;
-import java.time.LocalDate;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.negocio.controlventas.model.Cuota;
+import com.negocio.controlventas.model.EstadoCuota;
 import com.negocio.controlventas.model.EstadoVenta;
 
 public interface CuotaRepository
@@ -25,18 +23,20 @@ public interface CuotaRepository
             EstadoCuota estado);
 
     @Query("""
-            SELECT c
+            SELECT DISTINCT c
             FROM Cuota c
-            WHERE c.venta.cobrador.idCobrador = :idCobrador
-            AND c.venta.estado = :estadoVenta
+            JOIN FETCH c.venta v
+            JOIN FETCH v.cliente cl
+            LEFT JOIN FETCH v.cobrador co
+            WHERE co.idCobrador = :idCobrador
+            AND v.estado = :estadoVenta
             AND c.fechaVencimiento <= :fecha
             AND c.saldoCuota > 0
-            ORDER BY c.fechaVencimiento ASC
+            ORDER BY c.fechaVencimiento ASC,
+                     c.numeroCuota ASC
             """)
     List<Cuota> buscarCobrosHastaFecha(
             @Param("idCobrador") Long idCobrador,
-
             @Param("fecha") LocalDate fecha,
-
             @Param("estadoVenta") EstadoVenta estadoVenta);
 }

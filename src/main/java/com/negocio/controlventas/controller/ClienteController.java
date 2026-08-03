@@ -185,4 +185,29 @@ public class ClienteController {
                                                         error.getMessage()));
                 }
         }
+
+        @DeleteMapping("/{idCliente}/definitivo")
+public ResponseEntity<?> eliminarClienteDefinitivamente(
+        @PathVariable Long idCliente) {
+
+    try {
+        clienteService.eliminarClienteDefinitivamente(
+                idCliente);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "mensaje",
+                        "Cliente eliminado correctamente",
+                        "idCliente",
+                        idCliente));
+
+    } catch (IllegalArgumentException error) {
+
+        return ResponseEntity
+                .badRequest()
+                .body(Map.of(
+                        "mensaje",
+                        error.getMessage()));
+    }
+}
 }

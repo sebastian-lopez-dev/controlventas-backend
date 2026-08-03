@@ -12,31 +12,35 @@ import org.springframework.data.repository.query.Param;
 import com.negocio.controlventas.model.EstadoSalida;
 
 public interface DetalleSalidaRepository
-        extends JpaRepository<DetalleSalida, Long> {
+                extends JpaRepository<DetalleSalida, Long> {
 
-    List<DetalleSalida> findBySalida_IdSalida(Long idSalida);
+        List<DetalleSalida> findBySalida_IdSalida(Long idSalida);
 
-    Optional<DetalleSalida> findBySalida_IdSalidaAndProducto_IdProducto(
-            Long idSalida,
-            Long idProducto);
+        Optional<DetalleSalida> findBySalida_IdSalidaAndProducto_IdProducto(
+                        Long idSalida,
+                        Long idProducto);
 
-    List<DetalleSalida> findBySalida_IdSalidaAndDiferenciaNot(
-            Long idSalida,
-            Integer diferencia);
+        List<DetalleSalida> findBySalida_IdSalidaAndDiferenciaNot(
+                        Long idSalida,
+                        Integer diferencia);
 
-    List<DetalleSalida> findByDiferenciaNot(Integer diferencia);
+        List<DetalleSalida> findByDiferenciaNot(Integer diferencia);
 
-    @Query("""
-            SELECT COALESCE(
-                SUM(
-                    d.cantidadCargada
-                    - d.cantidadVendida
-                ),
-                0
-            )
-            FROM DetalleSalida d
-            WHERE d.salida.estado = :estado
-            """)
-    Long sumarStockEnCarro(
-            @Param("estado") EstadoSalida estado);
+        @Query("""
+                        SELECT COALESCE(
+                            SUM(
+                                d.cantidadCargada
+                                - d.cantidadVendida
+                            ),
+                            0
+                        )
+                        FROM DetalleSalida d
+                        WHERE d.salida.estado = :estado
+                        """)
+        Long sumarStockEnCarro(
+                        @Param("estado") EstadoSalida estado);
+
+        boolean existsByProducto_IdProducto(
+                        Long idProducto);
+
 }

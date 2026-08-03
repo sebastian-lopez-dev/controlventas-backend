@@ -1,5 +1,6 @@
 package com.negocio.controlventas.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,35 +15,38 @@ public class DatosInicialesConfig {
 
     @Bean
     public ApplicationRunner crearUsuariosIniciales(
-        UsuarioRepository usuarioRepository,
-        PasswordEncoder passwordEncoder
-    ) {
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            @Value("${app.initial.admin-password:}")
+            String contrasenaAdministrador,
+            @Value("${app.initial.gregorio-password:}")
+            String contrasenaGregorio) {
 
         return argumentos -> {
 
             crearAdministrador(
-                usuarioRepository,
-                passwordEncoder
-            );
+                    usuarioRepository,
+                    passwordEncoder,
+                    contrasenaAdministrador);
 
             crearUsuarioGregorio(
-                usuarioRepository,
-                passwordEncoder
-            );
+                    usuarioRepository,
+                    passwordEncoder,
+                    contrasenaGregorio);
         };
     }
 
     private void crearAdministrador(
-        UsuarioRepository usuarioRepository,
-        PasswordEncoder passwordEncoder
-    ) {
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            String contrasena) {
 
-        boolean administradorExiste =
-            usuarioRepository.existsByUsuarioIgnoreCase(
-                "admin"
-            );
+        boolean existe =
+                usuarioRepository
+                        .existsByUsuarioIgnoreCase(
+                                "admin");
 
-        if (administradorExiste) {
+        if (existe || contrasena.isBlank()) {
             return;
         }
 
@@ -50,14 +54,11 @@ public class DatosInicialesConfig {
 
         administrador.setUsuario("admin");
         administrador.setContrasena(
-            passwordEncoder.encode("Admin2026*")
-        );
+                passwordEncoder.encode(contrasena));
         administrador.setNombreCompleto(
-            "Administrador"
-        );
+                "Administrador");
         administrador.setRol(
-            RolUsuario.ADMINISTRADOR
-        );
+                RolUsuario.ADMINISTRADOR);
         administrador.setActivo(true);
         administrador.setIdCobrador(null);
 
@@ -65,16 +66,16 @@ public class DatosInicialesConfig {
     }
 
     private void crearUsuarioGregorio(
-        UsuarioRepository usuarioRepository,
-        PasswordEncoder passwordEncoder
-    ) {
+            UsuarioRepository usuarioRepository,
+            PasswordEncoder passwordEncoder,
+            String contrasena) {
 
-        boolean gregorioExiste =
-            usuarioRepository.existsByUsuarioIgnoreCase(
-                "gregorio"
-            );
+        boolean existe =
+                usuarioRepository
+                        .existsByUsuarioIgnoreCase(
+                                "gregorio");
 
-        if (gregorioExiste) {
+        if (existe || contrasena.isBlank()) {
             return;
         }
 
@@ -82,23 +83,12 @@ public class DatosInicialesConfig {
 
         gregorio.setUsuario("gregorio");
         gregorio.setContrasena(
-            passwordEncoder.encode("Gregorio2026*")
-        );
-        gregorio.setNombreCompleto(
-            "Gregorio"
-        );
-        gregorio.setRol(
-            RolUsuario.COBRADOR
-        );
+                passwordEncoder.encode(contrasena));
+        gregorio.setNombreCompleto("Gregorio");
+        gregorio.setRol(RolUsuario.COBRADOR);
         gregorio.setActivo(true);
-
-        /*
-         * Lo asignaremos al cobrador correcto
-         * después de revisar su ID en MySQL.
-         */
         gregorio.setIdCobrador(null);
 
         usuarioRepository.save(gregorio);
     }
-
 }

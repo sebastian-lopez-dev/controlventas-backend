@@ -110,6 +110,32 @@ public class ProductoController {
         }
     }
 
+    @DeleteMapping("/{idProducto}/definitivo")
+    public ResponseEntity<?> eliminarProductoDefinitivamente(
+            @PathVariable Long idProducto) {
+
+        try {
+            productoService
+                    .eliminarProductoDefinitivamente(
+                            idProducto);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "mensaje",
+                            "Producto eliminado definitivamente",
+                            "idProducto",
+                            idProducto));
+
+        } catch (IllegalArgumentException error) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of(
+                            "mensaje",
+                            error.getMessage()));
+        }
+    }
+
     @GetMapping("/activos")
     public List<Producto> listarProductosActivos() {
 

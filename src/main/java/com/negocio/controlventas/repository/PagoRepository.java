@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.negocio.controlventas.model.Pago;
 import java.time.LocalDateTime;
-
+import java.util.List;
+import com.negocio.controlventas.model.Pago;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -65,4 +66,8 @@ public interface PagoRepository
             @Param("fin") LocalDateTime fin,
 
             @Param("estado") EstadoPago estado);
+            boolean existsByVenta_IdVenta(Long idVenta);
+
+            List<Pago> findByVenta_IdVenta(
+        Long idVenta);
 }

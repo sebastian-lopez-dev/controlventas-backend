@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
-
+import org.springframework.web.bind.annotation.DeleteMapping;
 import com.negocio.controlventas.dto.AsignarCobradorRequest;
 import com.negocio.controlventas.dto.VentaCreditoRequest;
 import com.negocio.controlventas.model.VentaCredito;
@@ -153,6 +153,31 @@ public class VentaCreditoController {
 
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
+                    .body(Map.of(
+                            "mensaje",
+                            error.getMessage()));
+        }
+
+    }
+
+    @DeleteMapping("/{idVenta}")
+    public ResponseEntity<?> eliminarVenta(
+            @PathVariable Long idVenta) {
+
+        try {
+            ventaService.eliminarVenta(idVenta);
+
+            return ResponseEntity.ok(
+                    Map.of(
+                            "mensaje",
+                            "Contrato eliminado correctamente",
+                            "idVenta",
+                            idVenta));
+
+        } catch (IllegalArgumentException error) {
+
+            return ResponseEntity
+                    .badRequest()
                     .body(Map.of(
                             "mensaje",
                             error.getMessage()));

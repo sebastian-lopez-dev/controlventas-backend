@@ -32,17 +32,18 @@ public class SecurityConfig {
     @Value("${app.jwt.secret}")
     private String jwtSecret;
 
+    @Value("${app.cors.allowed-origins}")
+    private List<String> corsAllowedOrigins;
+
     @Bean
     public SecretKey jwtSecretKey() {
 
         byte[] claveBytes = jwtSecret.getBytes(
-            StandardCharsets.UTF_8
-        );
+                StandardCharsets.UTF_8);
 
         return new SecretKeySpec(
-            claveBytes,
-            "HmacSHA256"
-        );
+                claveBytes,
+                "HmacSHA256");
     }
 
     @Bean
@@ -53,116 +54,95 @@ public class SecurityConfig {
 
     @Bean
     public JwtEncoder jwtEncoder(
-        SecretKey jwtSecretKey
-    ) {
+            SecretKey jwtSecretKey) {
 
         return NimbusJwtEncoder
-            .withSecretKey(jwtSecretKey)
-            .build();
+                .withSecretKey(jwtSecretKey)
+                .build();
     }
 
     @Bean
     public JwtDecoder jwtDecoder(
-        SecretKey jwtSecretKey
-    ) {
+            SecretKey jwtSecretKey) {
 
         return NimbusJwtDecoder
-            .withSecretKey(jwtSecretKey)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build();
+                .withSecretKey(jwtSecretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(
-        HttpSecurity http
-    ) throws Exception {
+            HttpSecurity http) throws Exception {
 
         http
-            .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
 
-            .cors(cors -> cors.configurationSource(
-                corsConfigurationSource()
-            ))
+                .cors(cors -> cors.configurationSource(
+                        corsConfigurationSource()))
 
-            .sessionManagement(session -> session
-                .sessionCreationPolicy(
-                    SessionCreationPolicy.STATELESS
-                )
-            )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
 
-                .requestMatchers(
-                    HttpMethod.OPTIONS,
-                    "/**"
-                ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.OPTIONS,
+                                "/**")
+                        .permitAll()
 
-                .requestMatchers(
-                    HttpMethod.POST,
-                    "/api/auth/login"
-                ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/login")
+                        .permitAll()
 
-                .requestMatchers(
-                    "/",
-                    "/index.html",
-                    "/*.html",
-                    "/css/**",
-                    "/js/**",
-                    "/favicon.ico"
-                ).permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/*.html",
+                                "/css/**",
+                                "/js/**",
+                                "/favicon.ico")
+                        .permitAll()
 
-                .anyRequest().authenticated()
-            )
+                        .anyRequest().authenticated())
 
-            .oauth2ResourceServer(oauth2 -> oauth2
-                .jwt(Customizer.withDefaults())
-            );
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(Customizer.withDefaults()));
 
         return http.build();
     }
 
     @Bean
-    public CorsConfigurationSource
-        corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuracion =
-            new CorsConfiguration();
+        CorsConfiguration configuracion = new CorsConfiguration();
 
         configuracion.setAllowedOrigins(
-            List.of(
-                "http://localhost:5173",
-                "http://localhost:4173",
-                 "https://controlventas-mobile.vercel.app"
-            )
-        );
+                corsAllowedOrigins);
 
         configuracion.setAllowedMethods(
-            List.of(
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "PATCH",
-                "OPTIONS"
-            )
-        );
+                List.of(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "PATCH",
+                        "OPTIONS"));
 
         configuracion.setAllowedHeaders(
-            List.of(
-                "Authorization",
-                "Content-Type"
-            )
-        );
+                List.of(
+                        "Authorization",
+                        "Content-Type"));
 
         configuracion.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource origen =
-            new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource origen = new UrlBasedCorsConfigurationSource();
 
         origen.registerCorsConfiguration(
-            "/**",
-            configuracion
-        );
+                "/**",
+                configuracion);
 
         return origen;
     }

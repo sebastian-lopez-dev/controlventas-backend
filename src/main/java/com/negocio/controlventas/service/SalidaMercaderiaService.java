@@ -55,6 +55,14 @@ public class SalidaMercaderiaService {
 
         validarDatosGenerales(solicitud);
 
+        if (salidaRepository.existsByEstado(
+        EstadoSalida.ABIERTA)) {
+
+    throw new IllegalArgumentException(
+            "Ya existe una salida abierta. " +
+            "Primero debes finalizarla");
+}
+
         SalidaMercaderia salida = new SalidaMercaderia();
 
         salida.setFechaSalida(
@@ -384,111 +392,139 @@ public class SalidaMercaderiaService {
         return salidaRepository.save(salida);
     }
 
-    @Transactional
-    public SalidaMercaderia cerrarSalida(
-            Long idSalida,
-            CierreSalidaRequest solicitud) {
+   @Transactional
+public SalidaMercaderia cerrarSalida(
+        Long idSalida,
+        CierreSalidaRequest solicitud) {
 
-        SalidaMercaderia salida = buscarSalidaPorId(idSalida);
+    SalidaMercaderia salida =
+            buscarSalidaPorId(idSalida);
 
-        if (salida.getEstado() != EstadoSalida.ABIERTA) {
+    if (salida.getEstado()
+            != EstadoSalida.ABIERTA) {
+
+        throw new IllegalArgumentException(
+                "La salida ya está cerrada o cancelada");
+    }
+
+    List<DetalleSalida> detalles =
+            detalleSalidaRepository
+                    .findBySalida_IdSalida(idSalida);
+
+    List<ConteoProductoRequest> conteos =
+            solicitud == null
+                    || solicitud.getConteos() == null
+                    ? List.of()
+                    : solicitud.getConteos();
+
+    /*
+     * Permite cerrar una salida vacía.
+     * Esto sirve si fue creada accidentalmente
+     * o si retiraron toda la mercadería.
+     */
+    if (detalles.isEmpty()) {
+
+        if (!conteos.isEmpty()) {
             throw new IllegalArgumentException(
-                    "La salida ya está cerrada o cancelada");
-        }
-
-        if (solicitud == null
-                || solicitud.getConteos() == null
-                || solicitud.getConteos().isEmpty()) {
-
-            throw new IllegalArgumentException(
-                    "Debe ingresar el conteo de los productos");
-        }
-
-        List<DetalleSalida> detalles = detalleSalidaRepository
-                .findBySalida_IdSalida(idSalida);
-
-        if (solicitud.getConteos().size() != detalles.size()) {
-
-            throw new IllegalArgumentException(
-                    "Debe contar todos los productos "
-                            + "cargados en la salida");
-        }
-
-        Set<Long> productosContados = new HashSet<>();
-
-        for (ConteoProductoRequest conteo : solicitud.getConteos()) {
-
-            if (conteo.getIdProducto() == null) {
-                throw new IllegalArgumentException(
-                        "El producto del conteo es obligatorio");
-            }
-
-            if (conteo.getCantidadContada() == null
-                    || conteo.getCantidadContada() < 0) {
-
-                throw new IllegalArgumentException(
-                        "La cantidad contada no puede ser negativa");
-            }
-
-            if (!productosContados.add(
-                    conteo.getIdProducto())) {
-
-                throw new IllegalArgumentException(
-                        "Un producto no puede contarse dos veces");
-            }
-
-            DetalleSalida detalle = detalleSalidaRepository
-                    .findBySalida_IdSalidaAndProducto_IdProducto(
-                            idSalida,
-                            conteo.getIdProducto())
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "El producto con ID "
-                                    + conteo.getIdProducto()
-                                    + " no pertenece "
-                                    + "a esta salida"));
-
-            int stockEsperado = detalle.getStockEsperado();
-
-            int diferencia = conteo.getCantidadContada()
-                    - stockEsperado;
-
-            if (diferencia != 0
-                    && (conteo.getObservaciones() == null
-                            || conteo.getObservaciones().isBlank())) {
-
-                throw new IllegalArgumentException(
-                        "Debe escribir una observación para el producto "
-                                + detalle.getProducto().getNombre()
-                                + " porque existe una diferencia de "
-                                + diferencia);
-            }
-
-            detalle.setCantidadContada(
-                    conteo.getCantidadContada());
-
-            detalle.setDiferencia(diferencia);
-
-            detalle.setObservaciones(
-                    conteo.getObservaciones());
-
-            Producto producto = detalle.getProducto();
-
-            producto.setStockAlmacen(
-                    producto.getStockAlmacen()
-                            + conteo.getCantidadContada());
-
-            productoRepository.save(producto);
-
-            detalleSalidaRepository.save(detalle);
+                    "La salida no tiene productos para contar");
         }
 
         salida.setEstado(EstadoSalida.CERRADA);
-
-        salida.setFechaCierre(
-                LocalDateTime.now());
+        salida.setFechaCierre(LocalDateTime.now());
 
         return salidaRepository.save(salida);
     }
+
+    if (conteos.isEmpty()) {
+        throw new IllegalArgumentException(
+                "Debe ingresar el conteo de los productos");
+    }
+
+    if (conteos.size() != detalles.size()) {
+        throw new IllegalArgumentException(
+                "Debe contar todos los productos " +
+                "cargados en la salida");
+    }
+
+    Set<Long> productosContados =
+            new HashSet<>();
+
+    for (ConteoProductoRequest conteo : conteos) {
+
+        if (conteo.getIdProducto() == null) {
+            throw new IllegalArgumentException(
+                    "El producto del conteo es obligatorio");
+        }
+
+        if (conteo.getCantidadContada() == null
+                || conteo.getCantidadContada() < 0) {
+
+            throw new IllegalArgumentException(
+                    "La cantidad contada no puede ser negativa");
+        }
+
+        if (!productosContados.add(
+                conteo.getIdProducto())) {
+
+            throw new IllegalArgumentException(
+                    "Un producto no puede contarse dos veces");
+        }
+
+        DetalleSalida detalle =
+                detalleSalidaRepository
+                        .findBySalida_IdSalidaAndProducto_IdProducto(
+                                idSalida,
+                                conteo.getIdProducto())
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(
+                                        "El producto con ID "
+                                                + conteo.getIdProducto()
+                                                + " no pertenece a esta salida"));
+
+        int stockEsperado =
+                detalle.getStockEsperado();
+
+        int diferencia =
+                conteo.getCantidadContada()
+                        - stockEsperado;
+
+        if (diferencia != 0
+                && (conteo.getObservaciones() == null
+                || conteo.getObservaciones().isBlank())) {
+
+            throw new IllegalArgumentException(
+                    "Debe registrar una observación para "
+                            + detalle.getProducto().getNombre());
+        }
+
+        detalle.setCantidadContada(
+                conteo.getCantidadContada());
+
+        detalle.setDiferencia(diferencia);
+
+        detalle.setObservaciones(
+                conteo.getObservaciones());
+
+        /*
+         * Solamente la cantidad que tu papá
+         * contó regresa al almacén.
+         */
+        Producto producto =
+                detalle.getProducto();
+
+        producto.setStockAlmacen(
+                producto.getStockAlmacen()
+                        + conteo.getCantidadContada());
+
+        productoRepository.save(producto);
+        detalleSalidaRepository.save(detalle);
+    }
+
+    salida.setEstado(EstadoSalida.CERRADA);
+    salida.setFechaCierre(LocalDateTime.now());
+
+    return salidaRepository.save(salida);
+}
 
     public List<DetalleSalida> listarDiferencias(
             Long idSalida) {
